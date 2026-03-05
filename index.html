@@ -27,3 +27,92 @@
     <hr>
     <p>Escala de Calibração:</p>
     <div id="lista-cores" class="legenda"></div>
+  </div>
+
+  <script>
+    let captura;
+    
+    // Gabarito Completo e Atualizado (com pH 10 corrigido)
+    const GABARITO_PH = [
+      { ph: 1,  r: 173, g: 86,  b: 74  }, { ph: 2,  r: 180, g: 83,  b: 63  },
+      { ph: 3,  r: 206, g: 131, b: 72  }, { ph: 4,  r: 210, g: 161, b: 73  },
+      { ph: 5,  r: 220, g: 184, b: 78  }, { ph: 6,  r: 216, g: 193, b: 85  },
+      { ph: 7,  r: 172, g: 171, b: 80  }, { ph: 8,  r: 87,  g: 115, b: 69  },
+      { ph: 9,  r: 55,  g: 95,  b: 74  }, { ph: 10, r: 33,  g: 54,  b: 20  },
+      { ph: 11, r: 55,  g: 61,  b: 80  }, { ph: 12, r: 53,  g: 54,  b: 76  },
+      { ph: 13, r: 68,  g: 55,  b: 80  }
+    ];
+
+    function setup() {
+      let canvas = createCanvas(320, 240);
+      canvas.parent('canvas-container');
+      
+      // Configuração robusta da câmera
+      let restricoes = {
+        video: {
+          facingMode: "environment" // Força a câmera traseira
+        },
+        audio: false
+      };
+      
+      captura = createCapture(restricoes, function(stream) {
+        console.log("Câmera iniciada com sucesso!");
+      });
+      
+      captura.size(320, 240);
+      captura.hide();
+      
+      // Criar a legenda visual automaticamente (código que já tínhamos)
+      let lista = document.getElementById('lista-cores');
+      GABARITO_PH.forEach(item => {
+        let div = document.createElement('div');
+        div.className = 'quadradinho';
+        div.style.background = `rgb(${item.r},${item.g},${b})`; // Corrigido aqui (estava item.b)
+        div.title = `pH ${item.ph}`;
+        lista.appendChild(div);
+      });
+    }
+    function draw() {
+      image(captura, 0, 0, width, height);
+      // Alvo central
+      noFill();
+      stroke(255);
+      strokeWeight(2);
+      ellipse(width/2, height/2, 30, 30);
+      line(width/2 - 5, height/2, width/2 + 5, height/2);
+      line(width/2, height/2 - 5, width/2, height/2 + 5);
+    }
+
+    function mousePressed() {
+      if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+        let cor = get(mouseX, mouseY);
+        let r = red(cor);
+        let g = green(cor);
+        let b = blue(cor);
+        
+        // Atualiza a UI
+        document.getElementById('cor-box').style.background = `rgb(${r},${g},${b})`;
+        document.getElementById('rgb-display').innerText = `R:${Math.floor(r)} G:${Math.floor(g)} B:${Math.floor(b)}`;
+        
+        let phEncontrado = compararCores(r, g, b);
+        document.getElementById('ph-val').innerText = "pH Estimado: " + phEncontrado;
+      }
+    }
+
+    function compararCores(r, g, b) {
+      let menorDistancia = Infinity;
+      let phResultado = "--";
+
+      for (let item of GABARITO_PH) {
+        // Distância Euclidiana (Pitágoras 3D)
+        let d = dist(r, g, b, item.r, item.g, item.b);
+        if (d < menorDistancia) {
+          menorDistancia = d;
+          phResultado = item.ph;
+        }
+      }
+      return phResultado;
+    }
+  </script>
+</body>
+</html>
