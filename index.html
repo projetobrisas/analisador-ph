@@ -46,32 +46,21 @@
     function setup() {
       let canvas = createCanvas(320, 240);
       canvas.parent('canvas-container');
-      
-      // Configuração robusta da câmera
-      let restricoes = {
-        video: {
-          facingMode: "environment" // Força a câmera traseira
-        },
-        audio: false
-      };
-      
-      captura = createCapture(restricoes, function(stream) {
-        console.log("Câmera iniciada com sucesso!");
-      });
-      
+      captura = createCapture({ video: { facingMode: "environment" } });
       captura.size(320, 240);
       captura.hide();
       
-      // Criar a legenda visual automaticamente (código que já tínhamos)
+      // Criar a legenda visual automaticamente
       let lista = document.getElementById('lista-cores');
       GABARITO_PH.forEach(item => {
         let div = document.createElement('div');
         div.className = 'quadradinho';
-        div.style.background = `rgb(${item.r},${item.g},${b})`; // Corrigido aqui (estava item.b)
+        div.style.background = `rgb(${item.r},${item.g},${item.b})`;
         div.title = `pH ${item.ph}`;
         lista.appendChild(div);
       });
     }
+
     function draw() {
       image(captura, 0, 0, width, height);
       // Alvo central
