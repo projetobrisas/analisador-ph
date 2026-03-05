@@ -72,39 +72,22 @@
       line(width/2, height/2 - 5, width/2, height/2 + 5);
     }
 
+    function mousePressed() {
+      if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
+        let cor = get(mouseX, mouseY);
+        let r = red(cor);
+        let g = green(cor);
+        let b = blue(cor);
+        
+        // Atualiza a UI
+        document.getElementById('cor-box').style.background = `rgb(${r},${g},${b})`;
+        document.getElementById('rgb-display').innerText = `R:${Math.floor(r)} G:${Math.floor(g)} B:${Math.floor(b)}`;
+        
+        let phEncontrado = compararCores(r, g, b);
+        document.getElementById('ph-val').innerText = "pH Estimado: " + phEncontrado;
+      }
+    }
 
-// Substitua o link abaixo pelo SEU link copiado do passo anterior
-let urlBase = "https://docs.google.com/forms/d/e/1FAIpQLScYr7Yih2AcHapAYic44iIfrbbNB8nKNNREKHDqfZpMZ8v_7A/viewform?pli=1&usp=pp_url&entry.650122364=pH&entry.1845749865=999";
-
-function mousePressed() {
-  if (mouseX >= 0 && mouseX <= width && mouseY >= 0 && mouseY <= height) {
-    let cor = get(mouseX, mouseY);
-    let r = red(cor);
-    let g = green(cor);
-    let b = blue(cor);
-    
-    let phEncontrado = compararCores(r, g, b);
-    document.getElementById('ph-val').innerText = "pH Estimado: " + phEncontrado;
-    
-    // CRIAR O BOTÃO DE ENVIO DINÂMICO
-    let linkFinal = urlBase + phEncontrado;
-    
-    // Remove o botão antigo se existir e cria um novo
-    let botaoAntigo = document.getElementById('btn-enviar');
-    if (botaoAntigo) botaoAntigo.remove();
-    
-    let btn = createA(linkFinal, '➡️ Enviar para o Caderno de Campo', '_blank');
-    btn.id('btn-enviar');
-    btn.parent('info-container'); // Certifique-se de que a div .info tem esse ID ou use o body
-    btn.style('display', 'block');
-    btn.style('background', '#27ae60');
-    btn.style('color', 'white');
-    btn.style('padding', '10px');
-    btn.style('margin-top', '15px');
-    btn.style('text-decoration', 'none');
-    btn.style('border-radius', '5px');
-  }
-}
     function compararCores(r, g, b) {
       let menorDistancia = Infinity;
       let phResultado = "--";
