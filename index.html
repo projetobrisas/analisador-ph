@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cientistas de Dados - Analisador de pH</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <style>
+    body { text-align: center; font-family: sans-serif; background: #f0f0f0; margin: 0; padding: 20px; }
+    canvas { border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .info { background: white; padding: 15px; border-radius: 10px; margin-top: 15px; }
+    #ph-val { font-size: 2em; font-weight: bold; color: #2c3e50; }
+  </style>
+</head>
+<body>
+  <h2>🧪 Analisador de pH</h2>
+  <div id="canvas-container"></div>
+  
+  <div class="info">
+    <p>Toque na fita de pH na tela para medir:</p>
+    <div id="ph-val">pH: --</div>
+    <div id="cor-box" style="width: 50px; height: 50px; margin: 10px auto; border: 2px solid #000;"></div>
+  </div>
+
+  <script>
+    let captura;
+    let corSelecionada;
+
+    function setup() {
+      let canvas = createCanvas(320, 240);
+      canvas.parent('canvas-container');
+      // Inicia a câmera do celular (traseira)
+      captura = createCapture({ video: { facingMode: "environment" } });
+      captura.size(320, 240);
+      captura.hide();
+      corSelecionada = color(255);
+    }
+
+    function draw() {
+      image(captura, 0, 0, width, height);
+      // Desenha um alvo no centro
+      noFill();
+      stroke(255);
+      ellipse(width/2, height/2, 20, 20);
+    }
+
+    function mousePressed() {
+      // Pega a cor do pixel onde tocou
+      corSelecionada = get(mouseX, mouseY);
+      let r = red(corSelecionada);
+      let g = green(corSelecionada);
+      let b = blue(corSelecionada);
+      
+      document.getElementById('cor-box').style.background = `rgb(${r},${g},${b})`;
+      
+      // Lógica de estimativa simples (Gabarito)
+      let ph = estimarPH(r, g, b);
+      document.getElementById('ph-val').innerText = "pH Estimado: " + ph;
+    }
+
+    function estimarPH(r, g, b) {
+      // Exemplo de lógica: pH 4 (Avermelhado), pH 7 (Verde), pH 10 (Azul)
+      if (r > g && r > b) return "4.0 (Ácido)";
+      if (g > r && g > b) return "7.0 (Neutro)";
+      if (b > r && b > g) return "10.0 (Alcalino)";
+      return "Indefinido";
+    }
+  </script>
+</body>
+</html>
